@@ -24,74 +24,63 @@ To Implement ELGAMAL ALGORITHM
 6. Security: The security of the ElGamal algorithm relies on the difficulty of solving the discrete logarithm problem in a large prime field, making it secure for encryption.
 
 ## Program:
+
 ```
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
-// function for modular exponentiation
-long long power(long long a, long long b, long long p)
-{
-    long long result = 1;
-    a = a % p;
-
-    while (b > 0)
-    {
-        if (b % 2 == 1)
-            result = (result * a) % p;
-
-        a = (a * a) % p;
-        b = b / 2;
+// Function to compute modular exponentiation (base^exp % mod)
+long long int modExp(long long int base, long long int exp, long long int mod) {
+    long long int result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % mod;
+        }
+        base = (base * base) % mod;
+        exp = exp / 2;
     }
     return result;
 }
 
-int main()
-{
-    long long p, g, x, y, k, m;
-    long long a, b;
+int main() {
+    long long int p, g, privateKeyA, publicKeyA;
+    long long int k, message, c1, c2, decryptedMessage;
 
-    printf("Enter prime number p: ");
+    // Step 1: Input a large prime number (p) and a generator (g)
+    printf("Enter a large prime number (p): ");
     scanf("%lld", &p);
-
-    printf("Enter primitive root g: ");
+    printf("Enter a generator (g): ");
     scanf("%lld", &g);
 
-    printf("Enter private key x: ");
-    scanf("%lld", &x);
+    // Step 2: Alice inputs her private key
+    printf("Enter Alice's private key: ");
+    scanf("%lld", &privateKeyA);
 
-    printf("Enter message (number): ");
-    scanf("%lld", &m);
+    // Step 3: Compute Alice's public key (public_key = g^privateKeyA mod p)
+    publicKeyA = modExp(g, privateKeyA, p);
+    printf("Alice's public key: %lld\n", publicKeyA);
 
-    // Public key
-    y = power(g, x, p);
-
-    printf("Public Key (p, g, y) = (%lld, %lld, %lld)\n", p, g, y);
-
-    printf("Enter random key k: ");
+    // Step 4: Bob inputs the message to be encrypted and selects a random k
+    printf("Enter the message to encrypt (as a number): ");
+    scanf("%lld", &message);
+    printf("Enter a random number k: ");
     scanf("%lld", &k);
 
-    // Encryption
-    a = power(g, k, p);
-    b = (m * power(y, k, p)) % p;
+    // Step 5: Bob computes ciphertext (c1 = g^k mod p, c2 = (message * publicKeyA^k) mod p)
+    c1 = modExp(g, k, p);
+    c2 = (message * modExp(publicKeyA, k, p)) % p;
+    printf("Encrypted message (c1, c2): (%lld, %lld)\n", c1, c2);
 
-    printf("\nEncrypted Message: (a, b) = (%lld, %lld)\n", a, b);
-
-    // Decryption
-    long long s = power(a, x, p);
-    long long s_inv = power(s, p - 2, p);  // modular inverse
-
-    long long decrypted = (b * s_inv) % p;
-
-    printf("Decrypted Message: %lld\n", decrypted);
+    // Step 6: Alice decrypts the message (decryptedMessage = (c2 * c1^(p-1-privateKeyA)) mod p)
+    decryptedMessage = (c2 * modExp(c1, p - 1 - privateKeyA, p)) % p;
+    printf("Decrypted message: %lld\n", decryptedMessage);
 
     return 0;
 }
 ```
 
-
 ## Output:
-
+<img width="809" height="375" alt="image" src="https://github.com/user-attachments/assets/31207771-4330-4e73-9a74-4918b93df626" />
 
 
 
